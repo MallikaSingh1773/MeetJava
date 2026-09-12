@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title th:text="${meeting.title} + ' | MeetJava'">Meeting | MeetJava</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}"/>
+</head>
+<body class="in-meeting"
+      th:attr="data-code=${meeting.code}, data-name=${displayName}, data-title=${meeting.title}">
+
+<header class="topbar">
+    <div class="meta">
+        <strong th:text="${meeting.title}">Meeting</strong>
+        <button class="code-chip" id="copyCode" th:text="${meeting.code}" title="Copy meeting code">code</button>
+    </div>
+    <div class="status" id="connStatus">connecting…</div>
+</header>
+
+<div class="control-banner" id="controlBanner" hidden>
+    <span class="dot"></span>
+    <span id="controlBannerText">Someone is controlling your desktop.</span>
+    <button id="controlBannerStop" type="button">Stop control</button>
+</div>
+
+<div class="stage">
+    <section class="grid" id="videoGrid"></section>
+
+    <aside class="sidepanel" id="sidePanel">
+        <div class="tabs">
+            <button class="tab active" data-tab="chat">Chat</button>
+            <button class="tab" data-tab="people">People <span id="peopleCount">1</span></button>
+        </div>
+
+        <div class="tabpane active" id="pane-chat">
+            <div class="messages" id="messages"></div>
+            <form class="composer" id="chatForm" autocomplete="off">
+                <input type="text" id="chatInput" placeholder="Send a message" maxlength="2000"/>
+                <button type="submit">Send</button>
+            </form>
+        </div>
+
+        <div class="tabpane" id="pane-people">
+            <ul class="people" id="peopleList"></ul>
+        </div>
+    </aside>
+</div>
+
+<footer class="controls">
+    <button id="btnMic"    class="ctl" title="Mute / unmute">Mic on</button>
+    <button id="btnCam"    class="ctl" title="Camera on / off">Camera on</button>
+    <button id="btnShare"  class="ctl" title="Share your screen">Share screen</button>
+    <button id="btnPanel"  class="ctl" title="Show or hide the side panel">Panel</button>
+    <button id="btnLeave"  class="ctl danger">Leave</button>
+</footer>
+
+<div class="toast-stack" id="toasts"></div>
+
+<script th:src="@{/js/meeting.js}"></script>
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>MeetJava</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}"/>
+</head>
+<body class="lobby">
+
+<main class="lobby-card">
+    <h1>MeetJava</h1>
+    <p class="tagline">Video meetings, chat, screen share and remote desktop control. Built on Spring Boot and WebRTC.</p>
+
+    <div class="alert" th:if="${error}" th:text="${error}"></div>
+
+    <label class="field">
+        <span>Your name</span>
+        <input type="text" id="nameInput" placeholder="Mallika" autocomplete="name"/>
+    </label>
+
+    <form method="post" th:action="@{/meetings}" class="block" onsubmit="return carryName(this)">
+        <input type="hidden" name="name"/>
+        <label class="field">
+            <span>Meeting title</span>
+            <input type="text" name="title" placeholder="Team standup"/>
+        </label>
+        <button type="submit" class="primary">Start a new meeting</button>
+    </form>
+
+    <div class="divider"><span>or</span></div>
+
+    <form method="post" th:action="@{/join}" class="block" onsubmit="return carryName(this)">
+        <input type="hidden" name="name"/>
+        <label class="field">
+            <span>Meeting code</span>
+            <input type="text" name="code" placeholder="abc-defg-hjk" required autocomplete="off"/>
+        </label>
+        <button type="submit">Join meeting</button>
+    </form>
+</main>
+
+<script>
+    const saved = localStorage.getItem('meetjava.name');
+    if (saved) document.getElementById('nameInput').value = saved;
+
+    function carryName(form) {
+        const name = document.getElementById('nameInput').value.trim() || 'Guest';
+        localStorage.setItem('meetjava.name', name);
+        form.querySelector('input[name="name"]').value = name;
+        return true;
+    }
+</script>
+</body>
+</html>

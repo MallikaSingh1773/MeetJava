@@ -1,0 +1,43 @@
+# Brings up PostgreSQL and the app together:
+#
+#   docker compose up --build
+#
+# Then open http://localhost:8080
+#
+# Not required for local development. Running `mvn spring-boot:run` against a
+# locally installed PostgreSQL works exactly the same.
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: meetjava
+      POSTGRES_USER: meetjava
+      POSTGRES_PASSWORD: meetjava
+    ports:
+      - "5432:5432"
+    volumes:
+      - meetjava-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U meetjava"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  app:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/meetjava
+      DB_USER: meetjava
+      DB_PASSWORD: meetjava
+      # TURN_URL: turn:your-turn-server:3478
+      # TURN_USERNAME: user
+      # TURN_CREDENTIAL: pass
+    ports:
+      - "8080:8080"
+
+volumes:
+  meetjava-data:
