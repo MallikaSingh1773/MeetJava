@@ -1,6 +1,6 @@
 <div align="center">
 
-# MeetJ — Real-Time Video Meetings with Remote Desktop Control
+# MeetJava — Real-Time Video Meetings with Remote Desktop Control
 
 **Multi-party video and audio, screen sharing, live chat, and consent-based control of a remote desktop**
 
