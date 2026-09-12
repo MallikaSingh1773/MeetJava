@@ -301,8 +301,4 @@ Java Backend Developer
 
 [GitHub](https://github.com/MallikaSingh1773) · [Email](mailto:singhmallika1773@gmail.com)
 
----
 
-## License
-
-Released under the MIT License. See [LICENSE](LICENSE).
