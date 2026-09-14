@@ -67,8 +67,12 @@ public class DatabaseUrlEnvironmentPostProcessor implements EnvironmentPostProce
         StringBuilder jdbc = new StringBuilder("jdbc:postgresql://")
                 .append(host).append(':').append(port).append('/').append(database);
 
-        if (uri.getQuery() != null && !uri.getQuery().isBlank()) {
-            jdbc.append('?').append(uri.getQuery());
+        // Only sslmode is carried across. The rest of what providers put in a
+        // connection string (channel_binding, application_name, pool flags) is
+        // libpq vocabulary that the JDBC driver does not share.
+        String sslMode = sslModeOf(uri.getQuery());
+        if (sslMode != null) {
+            jdbc.append("?sslmode=").append(sslMode);
         } else if (host.contains(".")) {
             // An internal hostname on Render or Fly is a single label and speaks
             // plaintext inside the private network. A dotted public hostname is
@@ -86,5 +90,19 @@ public class DatabaseUrlEnvironmentPostProcessor implements EnvironmentPostProce
             props.put("spring.datasource.password", split < 0 ? "" : userInfo.substring(split + 1));
         }
         return props;
+    }
+
+    private static String sslModeOf(String query) {
+        if (query == null || query.isBlank()) {
+            return null;
+        }
+        for (String param : query.split("&")) {
+            int eq = param.indexOf('=');
+            if (eq > 0 && "sslmode".equalsIgnoreCase(param.substring(0, eq).trim())) {
+                String value = param.substring(eq + 1).trim();
+                return value.isEmpty() ? null : value;
+            }
+        }
+        return null;
     }
 }

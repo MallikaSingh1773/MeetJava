@@ -39,11 +39,21 @@ class DatabaseUrlEnvironmentPostProcessorTest {
     }
 
     @Test
-    @DisplayName("an explicit query string is preserved instead of being overwritten")
-    void queryStringIsKept() {
+    @DisplayName("an explicit sslmode is preserved instead of being overwritten")
+    void sslModeIsKept() {
         Map<String, Object> p = parse("postgresql://u:p@ep-cool.neon.tech/meetjava?sslmode=verify-full");
 
         assertEquals("jdbc:postgresql://ep-cool.neon.tech:5432/meetjava?sslmode=verify-full",
+                p.get("spring.datasource.url"));
+    }
+
+    @Test
+    @DisplayName("libpq only parameters are dropped, since the JDBC driver does not accept them")
+    void libpqParametersAreDropped() {
+        Map<String, Object> p = parse(
+                "postgresql://u:p@ep-cool.neon.tech/meetjava?sslmode=require&channel_binding=require");
+
+        assertEquals("jdbc:postgresql://ep-cool.neon.tech:5432/meetjava?sslmode=require",
                 p.get("spring.datasource.url"));
     }
 
