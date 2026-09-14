@@ -337,8 +337,14 @@ public class SignalingHandler extends TextWebSocketHandler {
         List<Map<String, Object>> servers = new ArrayList<>();
         servers.add(Map.of("urls", stunUrl));
         if (turnUrl != null && !turnUrl.isBlank()) {
+            // A comma separated list lets one TURN server be offered over UDP, TCP
+            // and TCP/443, which is what gets a call through a restrictive network.
+            List<String> urls = Arrays.stream(turnUrl.split(","))
+                    .map(String::trim)
+                    .filter(s -> !s.isEmpty())
+                    .toList();
             servers.add(Map.of(
-                    "urls", turnUrl,
+                    "urls", urls,
                     "username", turnUsername == null ? "" : turnUsername,
                     "credential", turnCredential == null ? "" : turnCredential));
         }

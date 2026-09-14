@@ -214,14 +214,44 @@ unchanged across environments.
 | `DB_URL` | `jdbc:postgresql://localhost:5432/meetjava` | JDBC connection URL |
 | `DB_USER` | `meetjava` | Database user |
 | `DB_PASSWORD` | `meetjava` | Database password |
+| `DATABASE_URL` | _(empty)_ | Platform supplied `postgresql://` connection string, converted to the three values above at startup |
 | `STUN_URL` | Google public STUN | STUN server |
-| `TURN_URL` | _(empty)_ | TURN server, required for connections across the internet |
+| `TURN_URL` | _(empty)_ | TURN server, required for connections across the internet; accepts a comma separated list |
 | `TURN_USERNAME` | _(empty)_ | TURN username |
 | `TURN_CREDENTIAL` | _(empty)_ | TURN credential |
+| `THYMELEAF_CACHE` | `false` | Template caching, enabled in production |
+| `LOG_LEVEL` | `DEBUG` | Application log level |
 
 PostgreSQL is the only database used by the application. H2 is declared at test scope
 exclusively, allowing `mvn test` to execute without a database installed. It is never packaged
 with the application.
+
+---
+
+## Deployment
+
+The application is packaged as a container and deployed from `render.yaml`, which provisions the
+web service and a managed PostgreSQL instance together.
+
+1. **Create the services.** In the Render dashboard, choose **New → Blueprint** and select this
+   repository. The blueprint reads `render.yaml` and creates `meetjava` and `meetjava-db`.
+2. **Database wiring.** The blueprint injects the database connection string as `DATABASE_URL`.
+   `DatabaseUrlEnvironmentPostProcessor` converts the `postgresql://` form into the JDBC URL,
+   username and password Spring requires, before the application context starts. No platform
+   specific values appear in `application.properties`.
+3. **Schema.** Hibernate creates the tables on first boot; `setup-database.sql` is only needed for
+   a self managed PostgreSQL instance.
+4. **TLS and WebSockets.** Render terminates TLS ahead of the container.
+   `server.forward-headers-strategy=framework` makes the application aware of the original scheme,
+   so the client opens `wss://` rather than being blocked as mixed content. HTTPS is also a hard
+   requirement for `getUserMedia`, which browsers refuse on insecure origins.
+5. **Health check.** The platform polls `/actuator/health`; only the health endpoint is exposed.
+6. **TURN.** `STUN_URL` alone connects two peers on most home networks. A peer on a mobile or
+   corporate network sits behind symmetric NAT and needs a relay, so set `TURN_URL`,
+   `TURN_USERNAME` and `TURN_CREDENTIAL` from a TURN provider and redeploy.
+
+Moving to a different PostgreSQL host, or to another container platform, is a change to
+`DATABASE_URL` and nothing else.
 
 ---
 
