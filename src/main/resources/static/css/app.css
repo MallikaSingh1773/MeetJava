@@ -255,6 +255,14 @@ body.in-meeting {
 }
 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .25; } }
 
+/*
+    The hidden attribute hides an element through the browser's own stylesheet,
+    which a class selector outranks. Without this rule the display:flex above
+    wins and the banner is on screen for every participant from page load,
+    announcing a control session that does not exist.
+*/
+.control-banner[hidden] { display: none; }
+
 .control-banner button {
     margin-left: auto;
     padding: 5px 14px;

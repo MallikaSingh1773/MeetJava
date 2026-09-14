@@ -220,6 +220,11 @@ public class SignalingHandler extends TextWebSocketHandler {
         boolean isController = agents.isAllowed(hostPeerId, self.peerId());
         if (!isHost && !isController) return;
 
+        // Nothing to tear down. Without this the host's stop button reports an
+        // ended session, and writes an audit row, every time it is pressed,
+        // whether or not anyone was ever controlling the machine.
+        if (agents.controllerOf(hostPeerId).isEmpty()) return;
+
         endControl(self.meetingCode(), hostPeerId,
                 isHost ? "revoked by host" : "ended by controller");
     }
