@@ -230,15 +230,15 @@ with the application.
 
 ## Deployment
 
-The application is packaged as a container and deployed from `render.yaml`, which provisions the
-web service and a managed PostgreSQL instance together.
+The application is packaged as a container and deployed from `render.yaml`. The database is
+deliberately not provisioned by the blueprint, so any managed PostgreSQL host can be used.
 
-1. **Create the services.** In the Render dashboard, choose **New → Blueprint** and select this
-   repository. The blueprint reads `render.yaml` and creates `meetjava` and `meetjava-db`.
-2. **Database wiring.** The blueprint injects the database connection string as `DATABASE_URL`.
-   `DatabaseUrlEnvironmentPostProcessor` converts the `postgresql://` form into the JDBC URL,
-   username and password Spring requires, before the application context starts. No platform
-   specific values appear in `application.properties`.
+1. **Create the service.** In the Render dashboard, choose **New → Blueprint** and select this
+   repository. The blueprint reads `render.yaml` and creates the `meetjava` web service.
+2. **Database wiring.** Supply the connection string of a managed PostgreSQL instance as
+   `DATABASE_URL`. `DatabaseUrlEnvironmentPostProcessor` converts the `postgresql://` form into
+   the JDBC URL, username and password Spring requires, before the application context starts.
+   No platform specific values appear in `application.properties`.
 3. **Schema.** Hibernate creates the tables on first boot; `setup-database.sql` is only needed for
    a self managed PostgreSQL instance.
 4. **TLS and WebSockets.** Render terminates TLS ahead of the container.
